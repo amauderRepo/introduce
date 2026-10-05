@@ -1,0 +1,780 @@
+/* ==========================================================================
+   intro-about — light technical document
+   --------------------------------------------------------------------------
+   Halaman satu yang bisa dicetak dan dibaca seperti spesifikasi teknis:
+   kertas hangat, tinta hampir hitam, satu aksen merah bata yang dipakai
+   hemat, dan tiga lapis tipografi (serif untuk display, sans untuk prosa,
+   mono untuk label).
+
+   Prinsip yang dipakai:
+     - Garis rambut 1px sebagai pemisah utama, bukan bayangan atau kotak.
+     - Aksen hanya di tiga tempat: nomor section, garis bawah link, dan
+       penanda kolom. Kalau warna mulai merembet, itu salah pakai.
+     - Struktur toldak grid tetap dari layar 480px sampai 1440px; tidak ada
+       titik balik layout, hanya pengurangan jarak.
+
+   Tanpa webfont. Semua tipografi memakai font sistem, jadi tidak ada request
+   ke pihak ketiga sama sekali.
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* --- tinta & kertas -------------------------------------------------- */
+  --paper: #f7f6f2;
+  /* Dipisah dari --ink supaya grid bisa pakai alpha tanpa mengubah warna teks. */
+  --ink-rgb: 25 25 23;
+  --ink: #191917;
+  --ink-2: #4a4a45;
+  --ink-3: #6e6e65;
+
+  /* Tiga berat garis, bukan satu — berat adalah bahasa gambar teknik.
+     --rule        memisah item di dalam satu section (baris matriks,
+                   baris timeline, sel title block)
+     --rule-bold   menutup section: garis atas tiap .section dan border chip
+     --rule-strong furniture halaman: garis bawah letterhead dan tanda bullet
+     Semuanya 1px kecuali yang ditandai. "Bold" di sini adalah warnanya,
+     bukan ketebalannya, supaya ritme garis tetap seragam di layar
+     resolusi tinggi dan di cetakan. */
+  --rule: #c6c3b7;
+  --rule-bold: #8b887c;
+  --rule-strong: #191917;
+
+  /* Aksen tunggal. Dipakai hemat: nomor section, hover link, penanda log. */
+  --accent: #b4441c;
+
+  --focus: #1a4fb4;
+
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia,
+    'Times New Roman', serif;
+  --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, 'DejaVu Sans Mono', monospace;
+
+  /* Tidak ada --measure. Dulu ada batas 68ch di blok paragraf, tapi
+     itu membuat tepi teks berhenti di dalam garis section. Sekarang
+     lebar teks = lebar kolom = lebar garis, dan panjang baris yang
+     muncul ditangani hyphens: auto di .hero__intro p / .log__points li. */
+  --gutter: clamp(20px, 5vw, 64px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  color: var(--paper);
+  background: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: -9999px;
+  z-index: 10;
+  padding: 10px 16px;
+  color: var(--paper);
+  background: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+}
+
+/* TabIndex="-1" dipakai supaya skip-link benar-benar memindahkan fokus.
+   Tanpa ini, browser menandai <main> tapi tidak menggulir ke sana. */
+main:focus {
+  outline: none;
+}
+
+/* --- substrat: grid kertas + crop mark + margin rail -------------------- */
+
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* Dua skala grid supaya halaman tetap punya tekstur tanpa jadi ramai:
+     24px untuk ritme, 120px untuk bidang besar. Alpha dijaga rendah —
+     di atas 0.08 teks mulai kehilangan kontras dan grid jadi konten. */
+  background-image:
+    linear-gradient(to right, rgb(var(--ink-rgb) / 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--ink-rgb) / 0.07) 1px, transparent 1px),
+    linear-gradient(to right, rgb(var(--ink-rgb) / 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(var(--ink-rgb) / 0.045) 1px, transparent 1px);
+  background-size:
+    120px 120px,
+    120px 120px,
+    24px 24px,
+    24px 24px;
+}
+
+/* Crop mark di empat pojok: dua garis L yang menandai batas bidang cetak. */
+.crop {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+}
+
+.crop::before,
+.crop::after {
+  position: absolute;
+  background: var(--ink-3);
+  content: '';
+  opacity: 0.5;
+}
+
+.crop::before {
+  width: 100%;
+  height: 1px;
+}
+
+.crop::after {
+  width: 1px;
+  height: 100%;
+}
+
+.crop--tl {
+  top: 14px;
+  left: 14px;
+}
+
+.crop--tr {
+  top: 14px;
+  right: 14px;
+  transform: scaleX(-1);
+}
+
+.crop--bl {
+  bottom: 14px;
+  left: 14px;
+  transform: scaleY(-1);
+}
+
+.crop--br {
+  right: 14px;
+  bottom: 14px;
+  transform: scale(-1);
+}
+
+/* Margin rail: label dokumen yang berjalan vertikal di tepi kiri, seperti
+   margin pada gambar teknik. position:fixed karena harus menempel ke
+   viewport, bukan ikut bergeser dengan isi. */
+.rail {
+  position: fixed;
+  bottom: 3.5rem;
+  left: 18px;
+  z-index: 0;
+  display: flex;
+  gap: 22px;
+  margin: 0;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  pointer-events: none;
+}
+
+/* Rail tidak boleh menabrak konten: disembunyikan sebelum ruang margin
+   cukup untuk menahannya. */
+@media (max-width: 66rem) {
+  .rail {
+    display: none;
+  }
+}
+
+/* --- kerangka halaman ---------------------------------------------------- */
+
+.page {
+  max-width: 62rem;
+  margin: 0 auto;
+  padding: 0 var(--gutter) clamp(56px, 9vw, 104px);
+}
+
+/* --- letterhead ---------------------------------------------------------- */
+
+.letterhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 24px;
+  padding: 20px 0 14px;
+  /* Garis ganda: yang tebal memisahkan identitas dari isi, yang tipis
+     menandai tepi dokumen. */
+  border-bottom: 2px solid var(--rule-strong);
+  box-shadow: 0 1px 0 var(--rule);
+}
+
+.letterhead__mark {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.letterhead__meta {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* --- prosa: rata kiri-kanan ---------------------------------------------- */
+/* Hanya teks paragraf yang justifies. Judul, label mono, chip, dan
+   affiliation pendek TIDAK ikut: justify menarik spasi di baris yang
+   cuma berisi satu atau dua kata, dan blok pendek yang diratakan penuh
+   kelihatan rusak di tepi kanannya.
+
+   `hyphens: auto` bukan aksesori di sini. Tanpa pemenggalan kata,
+   justify mengisi setiap celah dengan spasi, dan baris kedua ke bawah
+   jadi penuh rivers -- makin buruk di kolom sempit. Dengan `lang="en"`
+   di <html>, browser punya kamus pemenggal untuk bahasa Inggris. Kalau
+   halaman ini nanti berbahasa Indonesia, `hyphens: auto` butuh
+   `lang="id"` supaya pemenggalannya sesuai. */
+
+.hero__intro p,
+.log__points li {
+  text-align: justify;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
+
+/* --- hero ---------------------------------------------------------------- */
+
+.hero {
+  padding: clamp(44px, 8vw, 88px) 0 clamp(40px, 6vw, 64px);
+}
+
+.eyebrow {
+  margin: 0 0 clamp(20px, 3vw, 30px);
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero__name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 8vw, 4.9rem);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+/* Garis aksen pendek di bawah nama: satu-satunya tempat warna itu muncul
+   di blok pembuka. */
+.hero__name::after {
+  content: '';
+  display: block;
+  width: 54px;
+  height: 3px;
+  margin-top: clamp(20px, 3vw, 28px);
+  background: var(--accent);
+}
+
+.hero__role {
+  /* Lebar penuh, sama seperti paragraf hero: kolom teks di hero harus
+     satu tepi kanan yang sama dengan garis section. */
+  margin: clamp(20px, 3vw, 28px) 0 0;
+  color: var(--ink-2);
+  font-size: clamp(1rem, 1.6vw, 1.12rem);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* Tagline: satu-satunya serif besar kedua di halaman, dan satu-satunya
+   tempat aksen dipakai pada teks (bukan garis). Ukurannya di bawah nama
+   supaya hierarkinya jelas, tapi cukup besar untuk jadi momentum.
+   30ch di sini sengaja ditahan: ini pull quote dengan text-wrap: balance,
+   bukan paragraf. Balance butuh kolom sempit untuk membagi kalimat jadi
+   dua baris sama panjang; diberi lebar penuh, balance tidak punya yang
+   bisa diseimbangkan dan tagline jadi satu baris panjang yang menggantung. */
+.hero__tagline {
+  max-width: 30ch;
+  margin: clamp(26px, 4vw, 38px) 0 0;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+  line-height: 1.32;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.hero__intro {
+  /* Tidak ada max-width: teks harus berhenti tepat di tepi kanan kolom,
+     sama dengan garis section, border matrix, dan border log. Batas ch
+     apa pun di sini bikin tepi teks meleset ke dalam dan halaman
+     kehilangan garis vertikal yang rapi. Baris yang jadi panjang
+     akibatnya ditangani oleh hyphens: auto, bukan oleh pemotongan kolom. */
+  margin-top: clamp(28px, 4vw, 40px);
+  padding-left: clamp(16px, 2.5vw, 26px);
+  /* Blok paragraf pembuka punya sisi kirinya sendiri, memakai rule-bold
+     supaya dua blok prose itu punya bentuk dan bukan sekadar teks
+     yang mengambang. */
+  border-left: 2px solid var(--rule-bold);
+}
+
+.hero__intro p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 1.02rem;
+  line-height: 1.72;
+  text-wrap: pretty;
+}
+
+.hero__intro p + p {
+  margin-top: 1.05em;
+}
+
+
+/* --- section ------------------------------------------------------------- */
+
+.section {
+  padding-top: clamp(34px, 5vw, 52px);
+  /* Garis pembatas section: 2px dan jauh lebih gelap dari pembatas baris
+     di dalamnya. Ini yang bikin mata tahu di mana satu bagian selesai dan
+     bagian berikutnya mulai — kalau bobotnya sama, seluruh halaman terbaca
+     sebagai satu blok panjang. */
+  border-top: 2px solid var(--rule-bold);
+}
+
+.section__title {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin: 0 0 clamp(20px, 3vw, 28px);
+  font-family: var(--font-sans);
+  font-size: 1.56rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.section__num {
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+/* --- contact: app channels ----------------------------------------------- */
+
+.channels {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.channels__item {
+  border-bottom: 1px solid var(--rule);
+}
+
+.channel {
+  display: grid;
+  grid-template-columns: 2.75rem 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Logo platform dibungkus kotak sharp tanpa fill. Pakai bahasa visual
+   yang sama dengan .chip supaya contact terbaca sebagai bagian dari
+   dokumen ini, bukan widget yang ditempel. */
+.channel__mark {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--rule-bold);
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease;
+}
+
+.channel__mark svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  /* Monochrome mengikuti tinta halaman; warna merek asli akan merusak
+     palet dan bentrok dengan satu-satunya aksen yang ada. */
+  fill: var(--ink);
+  transition: fill 140ms ease;
+}
+
+.channel__text {
+  display: block;
+  min-width: 0;
+}
+
+.channel__name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.channel__handle {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.channel__ext {
+  color: var(--ink-3);
+  font-size: 0.85rem;
+  transition: transform 140ms ease;
+}
+
+.channel:hover .channel__mark,
+.channel:focus-visible .channel__mark {
+  border-color: var(--accent);
+  background: rgb(var(--ink-rgb) / 0.03);
+}
+
+.channel:hover .channel__mark svg,
+.channel:focus-visible .channel__mark svg {
+  fill: var(--accent);
+}
+
+.channel:hover .channel__name,
+.channel:focus-visible .channel__name,
+.channel:hover .channel__ext,
+.channel:focus-visible .channel__ext {
+  color: var(--accent);
+}
+
+.channel:hover .channel__ext,
+.channel:focus-visible .channel__ext {
+  transform: translate(2px, -2px);
+}
+
+/* --- skills: matrix ------------------------------------------------------ */
+
+.matrix {
+  border-top: 1px solid var(--rule);
+}
+
+.matrix__row {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 12px 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.matrix__key {
+  margin: 4px 0 0;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.matrix__items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Chip: kotak tajam, tanpa radius dan tanpa warna latar, hanya garis
+   rambut. Pembeda dari "tag" di desain lama adalah ketiadaan fill.
+   Border memakai --rule-bold karena di sinilah garis paling sering
+   muncul — 34 chip sekaligus. Kalau warnanya sama dengan pembatas
+   baris, semua chip larut dan baris Tooling kehilangan bentuknya. */
+.chip {
+  padding: 4px 9px;
+  border: 1px solid var(--rule-bold);
+  color: var(--ink-2);
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  white-space: nowrap;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* --- awards & recognition -------------------------------------------------- */
+/* Section ini sengaja memakai kelas .matrix yang sama dengan Skills: key
+   9rem + daftar chip. Dua section dengan bentuk data identik sebaiknya
+   berbagi komponen, bukan punya implementasi sendiri yang kebetulan
+   kelihatan sama. */
+
+.section__lead {
+  /* Lebar penuh juga, agar tepi kanannya ikut rata dengan garis. */
+  margin: -8px 0 clamp(20px, 3vw, 28px);
+  color: var(--ink-3);
+  font-size: 0.94rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* --- timeline: logbook --------------------------------------------------- */
+
+.log {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.log__entry {
+  display: grid;
+  grid-template-columns: 9rem 1fr;
+  gap: 4px 24px;
+  padding: 20px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.log__entry:last-child {
+  /* Garis bawah sengaja dihilangkan pada entry terakhir supaya tabel
+     tertutup rapat, bukan menggantung. */
+  border-bottom: 1px solid var(--rule);
+}
+
+.log__when {
+  margin: 2px 0 0;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+.log__what {
+  min-width: 0;
+}
+
+.log__role {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.12rem, 2.2vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.28;
+  letter-spacing: -0.005em;
+  text-wrap: balance;
+}
+
+.log__org {
+  margin: 4px 0 0;
+  color: var(--ink-3);
+  font-size: 0.84rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.log__points {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.log__points li {
+  position: relative;
+  /* Lebar penuh, sama seperti .hero__intro: tepi kanan bullet harus
+     rata dengan tepi kanan border .log__entry. */
+  padding-left: 18px;
+  color: var(--ink-2);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.log__points li + li {
+  margin-top: 6px;
+}
+
+/* Penanda daftar: garis pendek, bukan titik. Bulkanya 1px, sama dengan
+   semua garis lain di halaman ini. */
+.log__points li::before {
+  content: '';
+  position: absolute;
+  top: 0.72em;
+  left: 0;
+  width: 8px;
+  height: 1px;
+  background: var(--rule-strong);
+}
+
+
+/* --- layar sempit -------------------------------------------------------- */
+
+@media (max-width: 34rem) {
+  /* Di bawah ~540px kolom 9rem untuk label + 1fr untuk nilai jadi tidak
+     seimbang: "Vulnerability assessment" masih muat, tapi label
+     "Languages spoken" sudah sempit. Key turun ke baris sendiri, nilainya
+     tetap di kolom yang sama supaya tidak melebar penuh. */
+  .matrix__row,
+  .log__entry {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .log__entry {
+    gap: 10px;
+  }
+
+  .log__when {
+    margin: 0;
+    color: var(--accent);
+  }
+
+  .matrix__key {
+    margin: 0;
+  }
+
+  /* Di layar sempit handle platform masih muat, tapi kotak logo + teks +
+     panah sudah memakai hampir seluruh lebar. Panah cukup dihilangkan:
+     target=_blank sudah menandakan link ini menuju keluar. */
+  .channel {
+    grid-template-columns: 2.5rem 1fr;
+    gap: 14px;
+  }
+
+  .channel__ext {
+    display: none;
+  }
+}
+
+
+/* --- cetak -------------------------------------------------------------- */
+
+@media print {
+  /* Cetak tidak butuh warna kertas yang hangat, dan aksen merah bata
+     boros tinta. Semua jadi hitam di atas putih, hairline dipertahankan. */
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+  }
+
+  /* Grid kertas, crop mark, dan margin rail tidak berarti di atas kertas
+     printer: hilang seluruhnya. */
+  .sheet,
+  .rail {
+    display: none;
+  }
+
+  .log__role,
+  .hero__name,
+  .channel__name {
+    font-family: var(--font-display);
+  }
+
+  .page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .skip-link {
+    display: none;
+  }
+
+  .section,
+  .channel,
+  .matrix__row,
+  .log__entry,
+  .letterhead {
+    break-inside: avoid;
+  }
+
+  /* Logo platform tetap dicetak: tanpa warna jadi hanya silhouette, tapi
+     bentuknya masih terbaca sehingga platform-nya tetap dikenali. */
+  .channel__mark {
+    border-color: #000;
+  }
+
+  .channel__mark svg {
+    fill: #000;
+  }
+
+  .section__num,
+  .hero__name::after {
+    background: none;
+    color: #000;
+  }
+
+  .hero__name::after {
+    width: 40px;
+    height: 2px;
+    background: #000;
+  }
+
+  .log__entry {
+    padding: 12px 0;
+  }
+
+  .section {
+    padding-top: 18px;
+  }
+}
+
+/* --- reduced motion ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

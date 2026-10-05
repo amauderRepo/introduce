@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f6f2" />
+    <title>Bintang Fajar Putera Faza — cybersecurity engineer</title>
+    <meta
+      name="description"
+      content="Bintang Fajar Putera Faza, cybersecurity engineer based in Indonesia. Penetration testing, vulnerability assessment, and network security."
+    />
+    <meta name="author" content="Bintang Fajar Putera Faza" />
+
+    <meta property="og:type" content="profile" />
+    <meta property="og:title" content="Bintang Fajar Putera Faza — cybersecurity engineer" />
+    <meta
+      property="og:description"
+      content="Penetration testing, vulnerability assessment, and network security. Based in Indonesia."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <!-- Path relatif, bukan "/index.html". GitHub Pages menyajikan site proyek
+         dari /<nama-repo>/, jadi path berawalan "/" akan 404. Relatif tetap
+         benar di root domain maupun di subpath. -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="canonical" href="./" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <!-- Substrat dan margin. Keduanya dekoratif dan tidak membawa informasi,
+         jadi aria-hidden; metadata dokumen yang sebenarnya tetap ada sebagai
+         teks di title block dan rail, bukan cuma di sini. -->
+    <div class="sheet" aria-hidden="true">
+      <span class="crop crop--tl"></span>
+      <span class="crop crop--tr"></span>
+      <span class="crop crop--bl"></span>
+      <span class="crop crop--br"></span>
+    </div>
+    <p class="rail" aria-hidden="true">
+      <span>Amauder</span><span>Sheet 01 / 01</span><span>Scale 1:1</span
+      ><span>Rev A</span>
+    </p>
+
+    <div class="page">
+      <!-- Letterhead: memberi halaman ini identitas dokumen, bukan landing page. -->
+      <header class="letterhead">
+        <p class="letterhead__mark">Amauder</p>
+        <p class="letterhead__meta">
+          <span>Curriculum vitae</span>
+          <span aria-hidden="true">·</span>
+          <span>Indonesia</span>
+        </p>
+      </header>
+
+      <main id="main-content" tabindex="-1">
+        <section class="hero" aria-labelledby="hero-name">
+          <!-- Hero tidak diberi nomor: penomoran 01-07 milik tujuh section
+            di bawahnya, jadi profil tetap murni sebagai pengantar. -->
+          <p class="eyebrow">Profile</p>
+          <h1 class="hero__name" id="hero-name">Bintang Fajar<br />Putera Faza</h1>
+          <p class="hero__role">
+            Cybersecurity Engineer <span aria-hidden="true">·</span> Penetration testing,
+            vulnerability assessment, network security
+          </p>
+          <!-- Tagline dari profile.ts, sebelumnya tidak terpakai di halaman
+               mana pun. Diletakkan tepat setelah peran supaya jadi kalimat
+               yang dibaca kedua, sebelum paragraf yang panjang. -->
+          <p class="hero__tagline">I spent four years attacking identity. Now I defend it.</p>
+
+          <div class="hero__intro">
+            <p>
+              I am a cybersecurity engineer based in Indonesia. Most engagements start the
+              same way: someone points me at a system they already trust and asks what
+              happens when that trust is wrong.
+            </p>
+            <p>
+              At Intelix Global Crossing I ran technical discovery with clients, scoped the
+              work, executed the testing, and turned the results into commercial proposals.
+              At Brawijaya University I focused on network security and systems analysis,
+              and taught Operating Systems as a laboratory assistant.
+            </p>
+            <p>
+              Outside work I run the security track at POROS, the open source organisation
+              of the Faculty of Computer Science — currently Head of Internal, after two
+              years in public relations.
+            </p>
+          </div>
+        </section>
+
+        <!-- Satu komponen .log dipakai di empat section: Work Experience,
+             Projects, Organization, Education. Bentuk datanya sama --
+             periode, judul, afiliasi, bullet -- jadi satu implementasi
+             cukup, dan keempat section otomatis terlihat konsisten. Urutan
+             di dalam tiap section: dari yang terbaru. -->
+
+        <section class="section" aria-labelledby="work-heading">
+          <h2 class="section__title" id="work-heading">
+            <span class="section__num" aria-hidden="true">01</span> Work Experience
+          </h2>
+          <ol class="log">
+            <li class="log__entry">
+              <p class="log__when">2025 — 2026</p>
+              <div class="log__what">
+                <h3 class="log__role">Junior Technical Consultant</h3>
+                <p class="log__org">PT Intelix Global Crossing</p>
+                <ul class="log__points">
+                  <li>
+                    Ran technical discovery calls with prospective clients and scoped
+                    penetration testing and vulnerability assessment engagements.
+                  </li>
+                  <li>Executed security testing within agreed scope and validated findings.</li>
+                  <li>
+                    Translated technical requirements into commercial proposals, and
+                    supported the handoff from proposal into delivery.
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="projects-heading">
+          <h2 class="section__title" id="projects-heading">
+            <span class="section__num" aria-hidden="true">02</span> Projects
+          </h2>
+          <ol class="log">
+            <li class="log__entry">
+              <p class="log__when">2026</p>
+              <div class="log__what">
+                <h3 class="log__role">
+                  DNS Exfiltration Detection using Suricata &amp; Iodine
+                </h3>
+                <p class="log__org">Undergraduate Project</p>
+                <ul class="log__points">
+                  <li>
+                    Developed Suricata IDS/IPS rulesets to detect data exfiltration
+                    through DNS tunneling using Iodine.
+                  </li>
+                  <li>
+                    Designed detection rules covering upstream and downstream DNS
+                    communication with variations in DNS record types, encoding methods,
+                    fragment sizes, hostname configurations, and EDNS0.
+                  </li>
+                  <li>
+                    Achieved 99.99% Detection Rate and 0.0005% False Positive Rate in
+                    upstream IDS evaluation.
+                  </li>
+                  <li>
+                    Evaluated the ruleset in IPS mode using NFQUEUE to assess its ability
+                    to actively block detected DNS tunneling traffic.
+                  </li>
+                </ul>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="organization-heading">
+          <h2 class="section__title" id="organization-heading">
+            <span class="section__num" aria-hidden="true">03</span> Organization
+          </h2>
+          <ol class="log">
+            <li class="log__entry">
+              <p class="log__when">2025 — 2026</p>
+              <div class="log__what">
+                <h3 class="log__role">Head of Internal Division</h3>
+                <p class="log__org">
+                  POROS — Organization of Open Source, Faculty of Computer Science
+                </p>
+                <ul class="log__points">
+                  <li>Ran performance reviews and competency assessments across the division.</li>
+                  <li>Coordinated internal initiatives and kept member communication moving.</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="log__entry">
+              <p class="log__when">2024</p>
+              <div class="log__what">
+                <h3 class="log__role">Committee Member</h3>
+                <p class="log__org">PEMILWA Election Supervisory Committee, Brawijaya University</p>
+                <ul class="log__points">
+                  <li>
+                    Assessed the security of polling sites and the integrity of election
+                    materials, and reported weaknesses with mitigation recommendations.
+                  </li>
+                  <li>
+                    Coordinated with fellow committee members on monitoring strategy during
+                    the election period.
+                  </li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="log__entry">
+              <p class="log__when">2024 — 2025</p>
+              <div class="log__what">
+                <h3 class="log__role">Vice Head of Public Relations Division</h3>
+                <p class="log__org">
+                  POROS — Organization of Open Source, Faculty of Computer Science
+                </p>
+                <ul class="log__points">
+                  <li>Ran external communications for the Security Department.</li>
+                </ul>
+              </div>
+            </li>
+
+            <li class="log__entry">
+              <p class="log__when">2023 — 2026</p>
+              <div class="log__what">
+                <h3 class="log__role">Member, Security Department</h3>
+                <p class="log__org">
+                  POROS — Organization of Open Source, Faculty of Computer Science
+                </p>
+                <ul class="log__points">
+                  <li>Designed and ran the mentorship programme that onboards new members.</li>
+                </ul>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="education-heading">
+          <h2 class="section__title" id="education-heading">
+            <span class="section__num" aria-hidden="true">04</span> Education
+          </h2>
+          <ol class="log">
+            <li class="log__entry">
+              <p class="log__when">2026</p>
+              <div class="log__what">
+                <h3 class="log__role">Informatics Engineer — graduated</h3>
+                <p class="log__org">Brawijaya University · GPA 3.41 / 4.00</p>
+                <ul class="log__points">
+                  <li>Laboratory Teaching Assistant for the Operating Systems course.</li>
+                  <li>Thesis track in network security and systems analysis.</li>
+                </ul>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section" aria-labelledby="awards-heading">
+          <h2 class="section__title" id="awards-heading">
+            <span class="section__num" aria-hidden="true">05</span> Awards &amp; Recognition
+          </h2>
+          <!-- Dikelompokkan per penerbit, jadi tiga baris dan bukan
+               tujuh belas. Nama sertifikat tidak mengulang penerbitnya. -->
+          <p class="section__lead">Certifications held, grouped by issuing body.</p>
+          <div class="matrix">
+            <div class="matrix__row">
+              <p class="matrix__key">The SecOps Group</p>
+              <ul class="matrix__items">
+                <li class="chip">Certified Network Pentester (CNPen)</li>
+              </ul>
+            </div>
+            <div class="matrix__row">
+              <p class="matrix__key">CyberWarFare Labs</p>
+              <ul class="matrix__items">
+                <li class="chip">Certified Red Team Analyst (CRTA)</li>
+                <li class="chip">Certified AD Red Team Specialist (AD-RTS)</li>
+              </ul>
+            </div>
+            <div class="matrix__row">
+              <p class="matrix__key">Microsoft Certified</p>
+              <ul class="matrix__items">
+                <li class="chip">Security, Compliance, and Identity Fundamentals</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="skills-heading">
+          <h2 class="section__title" id="skills-heading">
+            <span class="section__num" aria-hidden="true">06</span> Skills
+          </h2>
+          <div class="matrix">
+            <div class="matrix__row">
+              <p class="matrix__key">Offensive</p>
+              <ul class="matrix__items">
+                <li class="chip">Penetration testing</li>
+                <li class="chip">Vulnerability assessment</li>
+                <li class="chip">Active Directory security</li>
+                <li class="chip">Network security</li>
+              </ul>
+            </div>
+            <div class="matrix__row">
+              <p class="matrix__key">Tooling</p>
+              <ul class="matrix__items">
+                <li class="chip">Burp Suite</li>
+                <li class="chip">Nmap</li>
+                <li class="chip">Metasploit</li>
+                <li class="chip">BloodHound</li>
+                <li class="chip">Rubeus</li>
+                <li class="chip">Impacket</li>
+                <li class="chip">Responder</li>
+                <li class="chip">Iodine</li>
+              </ul>
+            </div>
+            <div class="matrix__row">
+              <p class="matrix__key">Languages</p>
+              <ul class="matrix__items">
+                <li class="chip">Python</li>
+                <li class="chip">Bash</li>
+                <li class="chip">PowerShell</li>
+                <li class="chip">SQL</li>
+              </ul>
+            </div>
+            <div class="matrix__row">
+              <p class="matrix__key">Systems</p>
+              <ul class="matrix__items">
+                <li class="chip">Linux</li>
+                <li class="chip">Windows Server</li>
+                <li class="chip">Active Directory</li>
+                <li class="chip">Docker</li>
+                <li class="chip">Git</li>
+              </ul>
+            </div>
+            <div class="matrix__row">
+              <p class="matrix__key">Spoken</p>
+              <ul class="matrix__items">
+                <li class="chip">Indonesian</li>
+                <li class="chip">English</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" aria-labelledby="contact-heading">
+          <h2 class="section__title" id="contact-heading">
+            <span class="section__num" aria-hidden="true">07</span> Contact
+          </h2>
+          <!-- Dipindah ke bawah: urutan section mengikuti urutan cerita, bukan
+               urutan tempat orang mencari kontak. Logo platform ditulis
+               inline sebagai SVG (bukan icon font atau file eksternal)
+               supaya halaman tetap tanpa request ke pihak ketiga.
+               GitHub diganti WhatsApp: wa.me/{nomor}. -->
+          <ul class="channels">
+            <li class="channels__item">
+              <a
+                class="channel"
+                href="https://wa.me/6282141272506"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <span class="channel__mark" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path
+                      d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+                    />
+                  </svg>
+                </span>
+                <span class="channel__text">
+                  <span class="channel__name">WhatsApp</span>
+                  <span class="channel__handle">+62 821 4127 2506</span>
+                </span>
+                <span class="channel__ext" aria-hidden="true">↗</span>
+              </a>
+            </li>
+            <li class="channels__item">
+              <a
+                class="channel"
+                href="https://www.linkedin.com/in/bintang-fajar-putera-faza-b53459216/"
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                <span class="channel__mark" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" focusable="false">
+                    <path
+                      d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"
+                    />
+                  </svg>
+                </span>
+                <span class="channel__text">
+                  <span class="channel__name">LinkedIn</span>
+                  <span class="channel__handle">in/bintang-fajar-putera-faza</span>
+                </span>
+                <span class="channel__ext" aria-hidden="true">↗</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+      </main>
+    </div>
+  </body>
+</html>
