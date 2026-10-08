@@ -252,8 +252,45 @@ main:focus {
   background: var(--accent);
 }
 
+.hero__contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: clamp(20px, 3vw, 26px) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hero__contact a {
+  display: grid;
+  place-items: center;
+  width: 2.6rem;
+  height: 2.6rem;
+  border: 1px solid var(--rule-bold);
+  color: var(--ink-2);
+  background: transparent;
+  transition:
+    border-color 140ms ease,
+    color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease;
+}
+
+.hero__contact svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: currentColor;
+}
+
+.hero__contact a:hover,
+.hero__contact a:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgb(var(--ink-rgb) / 0.03);
+  transform: translateY(-2px);
+}
+
 .hero__role {
-  
   margin: clamp(20px, 3vw, 28px) 0 0;
   color: var(--ink-2);
   font-size: clamp(1rem, 1.6vw, 1.12rem);
@@ -355,98 +392,12 @@ main:focus {
   letter-spacing: 0.04em;
 }
 
-.channels {
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--rule);
-  list-style: none;
-}
-
-.channels__item {
-  border-bottom: 1px solid var(--rule);
-}
-
-.channel {
-  display: grid;
-  grid-template-columns: 2.75rem 1fr auto;
-  gap: 18px;
-  align-items: center;
-  padding: 20px 0;
-  color: inherit;
-  text-decoration: none;
-}
-
-.channel__mark {
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 1px solid var(--rule-bold);
-  transition:
-    border-color 140ms ease,
-    background-color 140ms ease;
-}
-
-.channel__mark svg {
-  width: 1.15rem;
-  height: 1.15rem;
-  
-  fill: var(--ink);
-  transition: fill 140ms ease;
-}
-
-.channel__text {
-  display: block;
-  min-width: 0;
-}
-
-.channel__name {
-  display: block;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: -0.005em;
-}
-
-.channel__handle {
-  display: block;
-  margin-top: 2px;
-  color: var(--ink-3);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  overflow-wrap: anywhere;
-}
-
-.channel__ext {
-  color: var(--ink-3);
-  font-size: 0.85rem;
-  transition: transform 140ms ease;
-}
-
-.channel:hover .channel__mark,
-.channel:focus-visible .channel__mark {
-  border-color: var(--accent);
-  background: rgb(var(--ink-rgb) / 0.03);
-}
-
-.channel:hover .channel__mark svg,
-.channel:focus-visible .channel__mark svg {
-  fill: var(--accent);
-}
-
-.channel:hover .channel__name,
-.channel:focus-visible .channel__name,
-.channel:hover .channel__ext,
-.channel:focus-visible .channel__ext {
-  color: var(--accent);
-}
-
-.channel:hover .channel__ext,
-.channel:focus-visible .channel__ext {
-  transform: translate(2px, -2px);
-}
-
 .matrix {
   border-top: 1px solid var(--rule);
+}
+
+.log + .matrix {
+  margin-top: clamp(24px, 4vw, 32px);
 }
 
 .matrix__row {
@@ -582,6 +533,10 @@ main:focus {
   background: var(--rule-strong);
 }
 
+.log__tags {
+  margin-top: 14px;
+}
+
 @media (max-width: 34rem) {
   .hero__intro p,
   .log__points li {
@@ -617,13 +572,9 @@ main:focus {
     margin: 0;
   }
 
-  .channel {
-    grid-template-columns: 2.5rem 1fr;
-    gap: 14px;
-  }
-
-  .channel__ext {
-    display: none;
+  .hero__contact a {
+    width: 2.4rem;
+    height: 2.4rem;
   }
 }
 
@@ -642,8 +593,7 @@ main:focus {
   }
 
   .log__role,
-  .hero__name,
-  .channel__name {
+  .hero__name {
     font-family: var(--font-display);
   }
 
@@ -657,19 +607,16 @@ main:focus {
   }
 
   .section,
-  .channel,
+  .hero__contact li,
   .matrix__row,
   .log__entry,
   .letterhead {
     break-inside: avoid;
   }
 
-  .channel__mark {
+  .hero__contact a {
     border-color: #000;
-  }
-
-  .channel__mark svg {
-    fill: #000;
+    color: #000;
   }
 
   .section__num,
