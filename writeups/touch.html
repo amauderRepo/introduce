@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8fafc" />
+    <title>HTB: Touch — Hack The Box writeup · Bintang Fajar Putera Faza</title>
+    <meta
+      name="description"
+      content="Walkthrough of the Hack The Box machine Touch (Windows, Easy): a leaked kiosk device portal, a crash-report browser escape, MySQL UDF privilege escalation to NT AUTHORITY\SYSTEM."
+    />
+    <meta name="author" content="Bintang Fajar Putera Faza" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="HTB: Touch — Hack The Box writeup" />
+    <meta
+      property="og:description"
+      content="Windows/Easy HTB machine: leaked kiosk credentials, a crash-report browser escape, and MySQL UDF privilege escalation to SYSTEM."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="canonical" href="https://portofolio.bintangfajar.my.id/writeups/touch.html" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../writeups.css" />
+
+    <script>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved === 'light' || saved === 'dark' ? saved : prefersDark ? 'dark' : 'light';
+          root.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="navbar" id="navbar">
+      <div class="navbar__inner">
+        <a class="brand" href="../index.html" aria-label="Bintang Fajar Putera Faza — home">
+          <span class="brand__mark" aria-hidden="true">B</span>
+          <span class="brand__text">Bintang Fajar</span>
+        </a>
+
+        <nav class="nav" id="nav" aria-label="Primary">
+          <ul class="nav__list">
+            <li><a class="nav__link" href="../index.html#about">About</a></li>
+            <li><a class="nav__link" href="../index.html#experience">Experience</a></li>
+            <li><a class="nav__link" href="../index.html#projects">Projects</a></li>
+            <li><a class="nav__link" href="../index.html#pipeline">Pipeline</a></li>
+            <li><a class="nav__link" href="../index.html#writeups">Writeups</a></li>
+            <li><a class="nav__link" href="../index.html#organization">Organization</a></li>
+            <li><a class="nav__link" href="../index.html#education">Education</a></li>
+            <li><a class="nav__link" href="../index.html#skills">Skills</a></li>
+            <li><a class="nav__link" href="../index.html#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="navbar__actions">
+          <button
+            class="icon-btn"
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle color theme"
+            title="Toggle color theme"
+          >
+            <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M21.64 13a1 1 0 0 0-1.05-.14 8.05 8.05 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Z"
+              />
+            </svg>
+            <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1Zm0-20a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V1a1 1 0 0 1 1-1Zm11 11a1 1 0 0 1-1 1h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1ZM4 12a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1Zm14.66-6.66a1 1 0 0 1 1.42 0 1 1 0 0 1 0 1.41l-.71.71a1 1 0 0 1-1.41-1.42l.7-.7Zm-13.32 0 .71.7A1 1 0 0 1 6.64 7.46a1 1 0 0 1-1.41 0l-.71-.71a1 1 0 0 1 1.42-1.41ZM12 19a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1Zm0-17a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1Zm8.66 15.66a1 1 0 0 1 0 1.41l-.7.71a1 1 0 0 1-1.42-1.42l.71-.7a1 1 0 0 1 1.41 0ZM4.05 4.34a1 1 0 0 1 0 1.41l-.71.71A1 1 0 0 1 1.93 5.05l.7-.71a1 1 0 0 1 1.42 0Z"
+                transform="translate(0 1)"
+              />
+            </svg>
+          </button>
+
+          <button
+            class="icon-btn nav-toggle"
+            id="nav-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="nav"
+            title="Menu"
+          >
+            <svg class="icon icon--menu" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M4 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2Zm0 5h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2Zm0 5h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2Z"
+              />
+            </svg>
+            <svg class="icon icon--close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M6.4 5a1 1 0 0 1 1.4 0L12 9.2 16.2 5a1 1 0 1 1 1.4 1.4L13.4 10.6l4.2 4.2a1 1 0 0 1-1.4 1.4L12 12l-4.2 4.2a1 1 0 0 1-1.4-1.4l4.2-4.2L6.4 6.4A1 1 0 0 1 6.4 5Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="article">
+      <div class="page-glow page-glow--fixed" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="../index.html#writeups">Writeups</a>
+        <span class="crumbs__sep" aria-hidden="true">/</span>
+        <span aria-current="page">Touch</span>
+      </nav>
+
+      <header class="article__header reveal">
+        <p class="section__label">Hack The Box · Walkthrough</p>
+        <h1 class="article__title">Touch</h1>
+        <p class="article__lead">
+          A Windows Easy box where an exposed <strong>Nexion DeviceHub</strong> device-enrollment
+          portal leaks its own kiosk credentials, a crash-report flow escapes the kiosk browser to a
+          real shell, and leftover MySQL <code>root</code> credentials lead to a UDF plugin load —
+          and SYSTEM.
+        </p>
+        <div class="article__meta">
+          <span class="diff diff--easy">Easy</span>
+          <span class="chip">Windows</span>
+          <span class="chip">Author · TheCyberGeek</span>
+        </div>
+      </header>
+
+      <figure class="machine-card reveal">
+        <div class="machine-card__bar">
+          <span class="machine-card__path">user@htb: ~/Touch</span>
+          <span class="machine-card__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+        <div class="machine-card__body">
+          <p class="machine-card__prompt">
+            <span class="u">user@htb</span>:<span class="p">~/Touch</span>$ cat machine.info
+          </p>
+          <div class="machine-card__grid">
+            <img
+              class="machine-card__avatar"
+              src="../assets/writeups/touch/avatar.png"
+              alt="Hack The Box machine “Touch” avatar"
+              width="118"
+              height="118"
+            />
+            <dl class="machine-card__info">
+              <div><dt>Machine</dt><dd>Touch</dd></div>
+              <div><dt>OS</dt><dd>Windows</dd></div>
+              <div><dt>Difficulty</dt><dd>Easy</dd></div>
+              <div><dt>Author</dt><dd>TheCyberGeek</dd></div>
+            </dl>
+          </div>
+          <p class="machine-card__note">
+            In the Layover machine, you uncovered a name and a booking confirmation code. Maybe
+            they'll come in handy here?
+          </p>
+          <p class="machine-card__creds">
+            <span class="u">Jenny Crawford</span> / <span class="p">KS7X2M</span>
+          </p>
+          <p class="machine-card__prompt">
+            <span class="u">user@htb</span>:<span class="p">~/Touch</span>$
+            <span class="machine-card__cursor">█</span>
+          </p>
+        </div>
+      </figure>
+
+      <article class="prose-article">
+        <h2 id="recon">Recon</h2>
+        <p>
+          Nmap finds 4 ports (<code>135</code>, <code>3389</code>, <code>5985</code>,
+          <code>8443</code>) on this machine:
+        </p>
+        <pre><code>marauder@forttablazed:~$ nmap -p 1-10000 10.129.54.151 -Pn
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-12 20:42 WIB
+Nmap scan report for 10.129.54.151
+Host is up (0.036s latency).
+Not shown: 9996 filtered tcp ports (no-response)
+PORT     STATE SERVICE
+135/tcp  open  msrpc
+3389/tcp open  ms-wbt-server
+5985/tcp open  wsman
+8443/tcp open  https-alt
+
+Nmap done: 1 IP address (1 host up) scanned in 35.25 seconds
+
+marauder@forttablazed:~$ nmap -p 135,3389,5985,8443 -sCV 10.129.54.151 -Pn
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-12 20:43 WIB
+Nmap scan report for 10.129.54.151
+Host is up (0.10s latency).
+
+PORT     STATE SERVICE       VERSION
+135/tcp  open  msrpc         Microsoft Windows RPC
+3389/tcp open  ms-wbt-server Microsoft Terminal Service
+5985/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Not Found
+|_http-server-header: Microsoft-HTTPAPI/2.0
+8443/tcp open  http          Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-server-header: Microsoft-HTTPAPI/2.0
+|_http-trane-info: Problem with XML parsing of /evox/about
+| http-title: Nexion DeviceHub - Login
+|_Requested resource was /login
+|_http-cors: GET POST PUT OPTIONS
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 144.42 seconds</code></pre>
+        <p>
+          Port 8443 is running an active web server (which is uncommon) built using XML, and it
+          supports four HTTP methods.
+        </p>
+
+        <h2 id="shell-rdp">Shell RDP as KioskUser</h2>
+
+        <h3>Login to Port 8443</h3>
+        <p>
+          The website requires a password to log in to the dashboard. Unfortunately, the password it
+          asks for is not the one listed in the machine information.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/login.png"
+            alt="Nexion DeviceHub login page"
+            width="1838"
+            height="954"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h4>Static Code Analysis</h4>
+        <p>
+          A static code analysis was performed to gather more information. The source code on the
+          <code>/login</code> page shows a login hint:
+        </p>
+        <pre><code>&lt;div class="login-hint" title="The default password is the device serial number included in your DeviceHub packaging."&gt;Forgot your password?&lt;/div&gt;</code></pre>
+
+        <h4>Finding the Password</h4>
+        <p>
+          Given that this website uses the <code>OPTIONS</code> method, it's reasonable to assume
+          that it uses an API for communication and is most likely still in a development
+          environment (not yet in production). Run a health check on the API to investigate further
+          and possibly identify the version and other details.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/api-health.png"
+            alt="API health check response revealing version details"
+            width="1072"
+            height="137"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h4>Dashboard Page</h4>
+        <p>
+          The website is a system used to validate passport tickets. The dashboard page displays new
+          credentials: <code>Username=KioskUser &amp; Password=K!0sk2026#</code>
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/dashboard-creds.png"
+            alt="DeviceHub dashboard revealing the KioskUser credentials"
+            width="1822"
+            height="955"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h4>Shell RDP</h4>
+        <p>
+          xfreerdp is used to connect with the new credentials. This appears to be an extended
+          feature on the website (we cannot go back to the Windows desktop — we are locked into this
+          feature).
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/rdp-kiosk.png"
+            alt="RDP session locked into the kiosk feature"
+            width="1822"
+            height="955"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>Use the information provided in the machine info.</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/machine-info-creds.png"
+            alt="Entering the credentials provided in the machine info"
+            width="1000"
+            height="786"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          But it fails at the Document phase, because the machine info didn't provide the document.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/document-scan-fail.png"
+            alt="Document scan phase failing"
+            width="982"
+            height="745"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h4>User.txt</h4>
+        <p>
+          At the moment, we can just make it crash and then spawn the browser, because we must send
+          a crash report to the developer — I mean, we must open the developer website. In the
+          document scan phase, turn off the scan service and load it to make it throw an error.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/scan-service-off.png"
+            alt="Disabling the scan service to force an error"
+            width="982"
+            height="745"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>Then an error pop-up will appear:</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/error-popup.png"
+            alt="Error pop-up with a link to the developer site"
+            width="982"
+            height="745"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>Click the link in the pop-up to open the browser:</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/open-browser.png"
+            alt="Browser opened from the error pop-up"
+            width="982"
+            height="745"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Open cmd via the browser at <code>C:\Windows\System32\cmd.exe</code>, then open the
+          downloaded cmd.exe using the folder option.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/open-cmd.png"
+            alt="Launching cmd.exe from the browser’s folder option"
+            width="982"
+            height="745"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>Read user.txt on the Desktop.</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/user-txt.png"
+            alt="Reading user.txt on the Desktop"
+            width="284"
+            height="83"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h2 id="nt-authority">Shell as NT Authority</h2>
+
+        <h3>Recon</h3>
+        <h4>Finding Hidden Files</h4>
+        <p>
+          As a Windows user, we enumerate hidden files first, because hidden files may contain more
+          important information than regular files. A new credential was found: <code>root</code>
+          &amp; <code>HTB@irw4ys_DB!2026!</code>
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/hidden-files-creds.png"
+            alt="MySQL root credentials found in a hidden file"
+            width="837"
+            height="420"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h3>MYSQL RCE via Load Plugin</h3>
+        <p>
+          <code>icacls.exe</code> is used to see who owns a file or folder. We validate the MySQL
+          plugin folder to confirm our permissions.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/icacls-plugin-folder.png"
+            alt="icacls output for the MySQL plugin folder"
+            width="576"
+            height="135"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          It has been confirmed that the user we are using is one of the owners or modifiers of this
+          folder, so we are verified to be able to modify it. Therefore, this is one low-hanging-fruit
+          path via the MySQL plugin. Link file UDF:
+          <a
+            href="https://github.com/rapid7/metasploit-framework/tree/master/data/exploits/mysql"
+            target="_blank"
+            rel="noreferrer noopener"
+            >rapid7/metasploit-framework — mysql UDF</a
+          >
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/udf-plugin.png"
+            alt="Uploading the UDF library to the MySQL plugin directory"
+            width="1030"
+            height="739"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Create a function with the library file that we added to the plugin directory, then load
+          and test it with a shell command.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/create-function.png"
+            alt="Creating and testing the UDF function"
+            width="671"
+            height="201"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Decode it from hex, and we get a shell running as the NT AUTHORITY user.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/nt-authority-shell.png"
+            alt="Shell running as NT AUTHORITY"
+            width="387"
+            height="169"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Get the flag from <code>C:\Users\Administrator\Desktop\root.txt</code>
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/root-txt.png"
+            alt="Reading root.txt as Administrator"
+            width="668"
+            height="245"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>Decode it from hex and submit the flag.</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/touch/submit-flag.png"
+            alt="Submitting the root flag"
+            width="1836"
+            height="958"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </article>
+
+      <footer class="article__foot">
+        <a class="btn btn--ghost" href="../index.html#writeups">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M10.7 5.3a1 1 0 0 1 0 1.4L6.42 11H20a1 1 0 0 1 0 2H6.42l4.3 4.3a1 1 0 0 1-1.42 1.4l-6-6a1 1 0 0 1 0-1.4l6-6a1 1 0 0 1 1.4 0Z"
+            />
+          </svg>
+          All writeups
+        </a>
+        <a
+          class="btn btn--primary"
+          href="https://app.hackthebox.com/machines/Touch"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Machine on HTB
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M14 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0V5.41l-8.29 8.3a1 1 0 0 1-1.42-1.42L17.59 4H14a1 1 0 0 1 0-2ZM5 5h4a1 1 0 0 1 0 2H5v12h12v-4a1 1 0 0 1 2 0v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
+            />
+          </svg>
+        </a>
+      </footer>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <p class="footer__name">Bintang Fajar Putera Faza</p>
+        <p class="footer__meta">
+          <span>Lamongan · Indonesia</span>
+          <span aria-hidden="true">·</span>
+          <span>© <span id="year">2026</span></span>
+        </p>
+      </div>
+    </footer>
+
+    <script src="../site.js" defer></script>
+  </body>
+</html>
