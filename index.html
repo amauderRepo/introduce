@@ -459,22 +459,22 @@
         </div>
 
         <div class="pipe-panel is-active" id="pipe-panel-va" data-pipe="va" role="tabpanel" aria-labelledby="pipe-tab-va">
-          <p class="pipe-panel__intro">A recurring, breadth-first programme that finds, validates, prioritises and tracks weaknesses across the asset estate — coverage and repeatability over exploitation.</p>
+          <p class="pipe-panel__intro">A recurring, breadth-first programme that inventories, scans, validates, prioritises and tracks weaknesses across the asset estate — coverage and repeatability over exploitation, and no stage depends on exploiting a finding.</p>
           <div class="method">
             <div class="method__list" role="tablist" aria-label="Vulnerability Assessment stages">
               <button class="stage" type="button" role="tab" aria-selected="true" data-stage="va-1">
                 <span class="stage__head">
-                  <span class="stage__id"><span class="stage__num">01</span><span class="stage__title">Inventory &amp; Discovery</span></span>
-                  <span class="stage__tag">Discover</span>
+                  <span class="stage__id"><span class="stage__num">01</span><span class="stage__title">Scope &amp; Authorisation</span></span>
+                  <span class="stage__tag">Legal</span>
                 </span>
-                <span class="stage__desc">Discover assets, map owners, and classify business criticality.</span>
+                <span class="stage__desc">Agree scope, windows, credentials and safe-check rules first.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-2">
                 <span class="stage__head">
-                  <span class="stage__id"><span class="stage__num">02</span><span class="stage__title">Scope &amp; Authorisation</span></span>
-                  <span class="stage__tag">Legal</span>
+                  <span class="stage__id"><span class="stage__num">02</span><span class="stage__title">Inventory &amp; Discovery</span></span>
+                  <span class="stage__tag">Discover</span>
                 </span>
-                <span class="stage__desc">Agree in/out of scope, scan windows, credentials and rules.</span>
+                <span class="stage__desc">Discover in-scope assets, map owners, classify criticality.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-3">
                 <span class="stage__head">
@@ -488,42 +488,42 @@
                   <span class="stage__id"><span class="stage__num">04</span><span class="stage__title">Configure Scans</span></span>
                   <span class="stage__tag">Setup</span>
                 </span>
-                <span class="stage__desc">Build scan profiles: auth, safe checks, throttling, schedule.</span>
+                <span class="stage__desc">Build scan and benchmark profiles: auth, safe checks, schedule.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-5">
                 <span class="stage__head">
                   <span class="stage__id"><span class="stage__num">05</span><span class="stage__title">Execute Scans</span></span>
                   <span class="stage__tag">Scan</span>
                 </span>
-                <span class="stage__desc">Run discovery and credentialed scans across every target type.</span>
+                <span class="stage__desc">Run discovery, credentialed scans and config checks.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-6">
                 <span class="stage__head">
                   <span class="stage__id"><span class="stage__num">06</span><span class="stage__title">Validate &amp; Triage</span></span>
                   <span class="stage__tag">Triage</span>
                 </span>
-                <span class="stage__desc">De-duplicate, remove false positives, confirm manually.</span>
+                <span class="stage__desc">De-duplicate, drop false positives, confirm without exploiting.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-7">
                 <span class="stage__head">
                   <span class="stage__id"><span class="stage__num">07</span><span class="stage__title">Risk &amp; Prioritise</span></span>
                   <span class="stage__tag">Prioritise</span>
                 </span>
-                <span class="stage__desc">Score with CVSS, weight by EPSS, exposure and KEV.</span>
+                <span class="stage__desc">Rate severity with CVSS, then weight by EPSS, exposure and KEV.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-8">
                 <span class="stage__head">
-                  <span class="stage__id"><span class="stage__num">08</span><span class="stage__title">Remediate &amp; Track</span></span>
-                  <span class="stage__tag">Fix</span>
-                </span>
-                <span class="stage__desc">Raise tickets with owners and deadlines; record exceptions.</span>
-              </button>
-              <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-9">
-                <span class="stage__head">
-                  <span class="stage__id"><span class="stage__num">09</span><span class="stage__title">Report</span></span>
+                  <span class="stage__id"><span class="stage__num">08</span><span class="stage__title">Report</span></span>
                   <span class="stage__tag">Report</span>
                 </span>
                 <span class="stage__desc">A technical report plus an executive summary and trends.</span>
+              </button>
+              <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-9">
+                <span class="stage__head">
+                  <span class="stage__id"><span class="stage__num">09</span><span class="stage__title">Remediate &amp; Track</span></span>
+                  <span class="stage__tag">Fix</span>
+                </span>
+                <span class="stage__desc">Raise tickets with owners and deadlines; record exceptions.</span>
               </button>
               <button class="stage" type="button" role="tab" aria-selected="false" data-stage="va-10">
                 <span class="stage__head">
@@ -546,24 +546,8 @@
                   <span class="detail__stage">Stage 01 of 11</span>
                   <span class="detail__label">Lifecycle</span>
                 </div>
-                <h3 class="detail__title">Inventory &amp; Discovery</h3>
-                <p class="detail__desc">Discover assets (network, host, web, cloud, container), map each to an owner in the CMDB, and classify business criticality.</p>
-                <div class="detail__block">
-                  <p class="detail__blockTitle">Artifacts</p>
-                  <p class="detail__value">Asset register</p>
-                </div>
-                <div class="detail__block">
-                  <p class="detail__blockTitle">Gate</p>
-                  <p class="detail__callout">Every asset has an owner</p>
-                </div>
-              </div>
-              <div class="detail" data-stage="va-2">
-                <div class="detail__top">
-                  <span class="detail__stage">Stage 02 of 11</span>
-                  <span class="detail__label">Lifecycle</span>
-                </div>
                 <h3 class="detail__title">Scope &amp; Authorisation</h3>
-                <p class="detail__desc">Agree what is in and out of scope, scan windows, credentials to use, throttling and a lightweight set of rules of engagement.</p>
+                <p class="detail__desc">Agree what is in and out of scope, scan windows, credentials to use, throttling and a lightweight set of rules of engagement — signed before any active discovery or scanning begins.</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Scan authorisation, scope document</p>
@@ -573,13 +557,29 @@
                   <p class="detail__callout">Written authorisation</p>
                 </div>
               </div>
+              <div class="detail" data-stage="va-2">
+                <div class="detail__top">
+                  <span class="detail__stage">Stage 02 of 11</span>
+                  <span class="detail__label">Lifecycle</span>
+                </div>
+                <h3 class="detail__title">Inventory &amp; Discovery</h3>
+                <p class="detail__desc">Discover assets inside the authorised scope (network, host, web, cloud, container), map each to an owner in the CMDB, and classify business criticality.</p>
+                <div class="detail__block">
+                  <p class="detail__blockTitle">Artifacts</p>
+                  <p class="detail__value">Asset register</p>
+                </div>
+                <div class="detail__block">
+                  <p class="detail__blockTitle">Gate</p>
+                  <p class="detail__callout">Every asset has an owner</p>
+                </div>
+              </div>
               <div class="detail" data-stage="va-3">
                 <div class="detail__top">
                   <span class="detail__stage">Stage 03 of 11</span>
                   <span class="detail__label">Lifecycle</span>
                 </div>
                 <h3 class="detail__title">Baseline &amp; Risk Model</h3>
-                <p class="detail__desc">Choose the benchmarks to test against, the severity/risk model, and the remediation SLAs per severity.</p>
+                <p class="detail__desc">Choose the benchmarks to test against (CIS, STIG, vendor guides), the severity/risk model, and the remediation SLAs per severity.</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Baseline standard document</p>
@@ -595,7 +595,7 @@
                   <span class="detail__label">Lifecycle</span>
                 </div>
                 <h3 class="detail__title">Configure Scans</h3>
-                <p class="detail__desc">Build scan profiles: authenticated vs unauthenticated, safe checks, plugin sets, throttling and a recurring schedule.</p>
+                <p class="detail__desc">Build scan and benchmark profiles: authenticated vs unauthenticated, safe checks, plugin sets, throttling and a recurring schedule.</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Scan profiles</p>
@@ -611,7 +611,7 @@
                   <span class="detail__label">Lifecycle</span>
                 </div>
                 <h3 class="detail__title">Execute Scans</h3>
-                <p class="detail__desc">Run discovery and credentialed scans across network, host, web, API, cloud and container/image targets.</p>
+                <p class="detail__desc">Run discovery, credentialed vulnerability scans and benchmark/config checks across network, host, web, API, cloud and container/image targets.</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Raw scan output</p>
@@ -627,7 +627,7 @@
                   <span class="detail__label">Lifecycle</span>
                 </div>
                 <h3 class="detail__title">Validate &amp; Triage</h3>
-                <p class="detail__desc">De-duplicate results, remove false positives, and manually confirm findings before they reach a client.</p>
+                <p class="detail__desc">De-duplicate results, remove false positives, and confirm each finding exists (banner, version, config or safe check) without exploiting it. Nothing reaches an asset owner unvalidated.</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Validated findings</p>
@@ -643,7 +643,7 @@
                   <span class="detail__label">Lifecycle</span>
                 </div>
                 <h3 class="detail__title">Risk &amp; Prioritise</h3>
-                <p class="detail__desc">Score each finding with CVSS, then weight it by EPSS, asset criticality, exposure and known-exploited status (CISA KEV).</p>
+                <p class="detail__desc">Separate severity from risk: rate each finding with CVSS, then weight it by EPSS, asset criticality, exposure and known-exploited status (CISA KEV).</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Prioritised backlog</p>
@@ -658,6 +658,22 @@
                   <span class="detail__stage">Stage 08 of 11</span>
                   <span class="detail__label">Lifecycle</span>
                 </div>
+                <h3 class="detail__title">Report</h3>
+                <p class="detail__desc">Produce the technical report and executive summary that drive remediation, with trends and SLA compliance rather than a raw scanner dump.</p>
+                <div class="detail__block">
+                  <p class="detail__blockTitle">Artifacts</p>
+                  <p class="detail__value">VA report (technical + executive)</p>
+                </div>
+                <div class="detail__block">
+                  <p class="detail__blockTitle">Gate</p>
+                  <p class="detail__callout">Report delivered</p>
+                </div>
+              </div>
+              <div class="detail" data-stage="va-9">
+                <div class="detail__top">
+                  <span class="detail__stage">Stage 09 of 11</span>
+                  <span class="detail__label">Lifecycle</span>
+                </div>
                 <h3 class="detail__title">Remediate &amp; Track</h3>
                 <p class="detail__desc">Raise tickets with owners and deadlines, and record exceptions or accepted risks where remediation is deferred.</p>
                 <div class="detail__block">
@@ -669,29 +685,13 @@
                   <p class="detail__callout">Owners assigned</p>
                 </div>
               </div>
-              <div class="detail" data-stage="va-9">
-                <div class="detail__top">
-                  <span class="detail__stage">Stage 09 of 11</span>
-                  <span class="detail__label">Lifecycle</span>
-                </div>
-                <h3 class="detail__title">Report</h3>
-                <p class="detail__desc">Produce a technical report plus an executive summary, with trends and SLA compliance rather than a raw scanner dump.</p>
-                <div class="detail__block">
-                  <p class="detail__blockTitle">Artifacts</p>
-                  <p class="detail__value">VA report</p>
-                </div>
-                <div class="detail__block">
-                  <p class="detail__blockTitle">Gate</p>
-                  <p class="detail__callout">Report delivered</p>
-                </div>
-              </div>
               <div class="detail" data-stage="va-10">
                 <div class="detail__top">
                   <span class="detail__stage">Stage 10 of 11</span>
                   <span class="detail__label">Lifecycle</span>
                 </div>
                 <h3 class="detail__title">Re-scan &amp; Verify</h3>
-                <p class="detail__desc">Confirm fixes with a targeted re-scan, reopen failed remediations and measure the delta since the last cycle.</p>
+                <p class="detail__desc">Re-scan the remediated assets to confirm the fixes, reopen failed remediations and measure the delta since the last report.</p>
                 <div class="detail__block">
                   <p class="detail__blockTitle">Artifacts</p>
                   <p class="detail__value">Verification / delta report</p>
@@ -733,7 +733,7 @@
                   <tbody>
                     <tr>
                       <td>VA methodology</td>
-                      <td>NIST SP 800-40, NIST SP 800-115, CIS Controls v8 (Control 7), ISO/IEC 27001 A.8.8, PCI DSS 11.3, NIST CSF</td>
+                      <td>NIST SP 800-40, NIST SP 800-115, CIS Controls v8 (Control 7), ISO/IEC 27001 A.8.8, PCI DSS 11.2, NIST CSF</td>
                     </tr>
                     <tr>
                       <td>Hardening baselines</td>
